@@ -7,19 +7,51 @@
 </head>
 
 <body>
-  <button data-animal="cat">cat</button>
-  <button data-animal="dog">dog</button>
-  <button data-animal="horse">horse</button>
-  <button data-animal="rabbit">rabbit</button>
-  <button data-animal="bunny">bunny</button>
-  <button data-animal="pony">pony</button>
-  <button data-animal="unicorn">unicorn</button>
-  <button data-animal="ferret">ferret</button>
-
+  <div id="buttons"></div>
+  <form>
+    <div class="form-group">
+      <label for="exampleInputEmail1">Want more types of gifs</label>
+      <input type="email" class="form-control" id="new" aria-describedby="emailHelp" placeholder="Type word here">
+      <button id="submit" class="btn btn-dark">Submit</button>
+    </div>
+  </form>
   <div id="gifs-appear-here">
   </div>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script type="text/javascript">
+    //make an array of strings for each data-animal choice
+    //create buttons using dynamic jquery
+
+    //Button topics
+    var topics = ["cat", "dog", "horse", "rabbit", "bunny",
+    "pony", "unicorn", "ferret"]
+
+    //Creating the buttons
+    function makeButtons(a){
+      for(var i=0; i<a.length; i++){
+        var button = $("<button>")
+        button.attr("data-animal", a[i])
+        button.text(a[i])
+        $("#buttons").append(button)
+      }
+    }
+    makeButtons(topics)
+    //adding new buttons
+    $("#submit").on("click", function(event){
+      event.preventDefault();
+
+      var name = $("#new").val().trim()
+      console.log(name)
+      console.log(typeof name)
+      topics.push(name)
+
+      var newTopics = [name]
+      console.log(typeof newTopics)
+      
+      makeButtons(newTopics)
+    })
+    
+
     // Adding click event listen listener to all buttons
     $("button").on("click", function() {
       // Grabbing and storing the data-animal property value from the button
@@ -54,17 +86,59 @@
             // Creating and storing an image tag
             var animalImage = $("<img>");
             // Setting the src attribute of the image to a property pulled off the result item
-            animalImage.attr("src", results[i].images.fixed_height.url);
+
+            //animalImage.attr("src", results[i].images.fixed_height.url);
+            var file = results[i].images.fixed_height.url
+            //animalImage.attr("src")
+            console.log(file)
+
+            //Making the paused version of the gif
+            var f1 = file.lastIndexOf(".")
+            var f2 = file.substr(0, f1)
+            var f3 = file.substr(f1)
+            var f4 = f2+'_s'+f3
+            console.log(f4)
+            
+            //Making the default paused and having data- for both for click event
+            animalImage.attr("src", f4);
+            animalImage.attr("data-still", f4)
+            animalImage.attr("data-animate", file)
+            animalImage.attr("data-state", "still")
+
+            //Adding "gif" class
+            animalImage.addClass("gif")
+            //animalImage.attr("onClick", "return click();")
 
             // Appending the paragraph and image tag to the animalDiv
-            animalDiv.append(p);
             animalDiv.append(animalImage);
+            animalDiv.append(p);
 
             // Prependng the animalDiv to the HTML page in the "#gifs-appear-here" div
             $("#gifs-appear-here").prepend(animalDiv);
           }
         });
     });
+
+
+    // Click event for unpausing the images
+    $(".gif").on("click", function() {
+      console.log("click works")
+      // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+      var state = $(this).attr("data-state");
+      // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+      // Then, set the image's data-state to animate
+      // Else set src to the data-still value
+      if (state === "still") {
+        $(this).attr("src", $(this).attr("data-animate"));
+        $(this).attr("data-state", "animate");
+      } else {
+        $(this).attr("src", $(this).attr("data-still"));
+        $(this).attr("data-state", "still");
+      }
+    });
+    // * `q`
+    //  * `limit`
+    //  * `rating`
   </script>
 </body>
 
